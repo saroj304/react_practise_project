@@ -23,5 +23,7 @@ const reactElement={
 }
 
 const mainContainer=document.getElementById('root');
-
+/**
+ * show how element is inserted into container
+ */
 customRender(reactElement,mainContainer);

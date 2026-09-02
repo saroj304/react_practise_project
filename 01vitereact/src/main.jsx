@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client';
 import React from 'react';
 import App from './App.jsx';
 
-
 const renderElement = React.createElement(
   'h1',
   { className: 'heading' },
@@ -12,5 +11,5 @@ const renderElement = React.createElement(
 
 
 createRoot(document.getElementById('root')).render(
-renderElement
+    <App/>
 );
