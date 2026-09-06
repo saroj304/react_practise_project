@@ -1,113 +1,91 @@
 import { useState } from "react";
+import InputBox from "./components/Input";
+import "./App.css";
+import useCurrencyInfo from "./hooks/userCurrencyInfo";
 
-function PasswordGenerator() {
-  const [length, setLength] = useState(12);
-  const [includeNumbers, setIncludeNumbers] = useState(false);
-  const [includeCharacters, setIncludeCharacters] = useState(false);
-  const [password, setPassword] = useState("");
-  const [copied, setCopied] = useState(false);
+function App() {
+    const [amount, setAmount] = useState(0);
+    const [to, setTo] = useState("inr");
+    const [from, setFrom] = useState("usd");
+    const [convertedAmount, setConvertedAmount] = useState(0);
 
-  const generatePassword = () => {
-    let characters =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    const currencyInfo = useCurrencyInfo(from);
+   console.log("fetched info",currencyInfo)
+    const options = Object.keys(currencyInfo);
+    console.log(options)
+    const swap = () => {
+        setFrom(to);
+        setTo(from);
+        setConvertedAmount(amount);
+    };
+    const convert = () => {
+        setConvertedAmount(amount * currencyInfo[to]);
+    };
+    return (
+        <div
+            className="w-full h-screen flex flex-wrap justify-center items-center bg-cover bg-no-repeat"
+            style={{
+                backgroundImage:
+                    `url('https://images.pexels.com/photos/27347529/pexels-photo-27347529.jpeg')`,
+            }}
+        >
+            <div className="w-full">
+                <div className="w-full max-w-md mx-auto border border-gray-60 rounded-lg p-5 backdrop-blur-sm bg-white/30">
 
-    if (includeNumbers) {
-      characters += "0123456789";
-    }
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            convert()
+                        }}
+                    >
 
-    if (includeCharacters) {
-      characters += "!@#$%^&*()_+-=[]{}";
-    }
+                        {/* FROM */}
+                        <div className="w-full mb-1">
+                            <InputBox
+                                label="From"
+                                amount={amount}
+                                onAmountChange={(amt)=>setAmount(amt)}
+                                onCurrencyChange={(currency) => setFrom(currency)}
+                                currencyOptions={options}
+                                selectCurrency={from}
+                            />
+                        </div>
 
-    let generatedPassword = "";
+                        {/* SWAP */}
+                        <div className="relative w-full h-0.5">
+                            <button
+                                type="button"
+                                onClick={swap}
+                                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-white rounded-md bg-blue-600 text-white px-2 py-0.5"
+                            >
+                                swap
+                            </button>
+                        </div>
 
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(
-          Math.random() * characters.length
-      );
+                        {/* TO */}
+                        <div className="w-full mt-1 mb-4">
+                            <InputBox
+                                label="To"
+                                amount={convertedAmount}
+                                currencyOptions={options}
+                                selectCurrency={to}
+                                currencyDisable={false}
+                            />
+                        </div>
 
-      generatedPassword += characters[randomIndex];
-    }
+                        {/* CONVERT */}
+                        <button
+                            type="submit"
+                            className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg"
+                        >
+                            Convert
+                        </button>
 
-    setPassword(generatedPassword);
-    setCopied(false);
-  };
-
-  const copyPassword = async () => {
-    await navigator.clipboard.writeText(password);
-    setCopied(true);
-  };
-
-  return (
-      <div>
-        <h1>Password Generator</h1>
-
-        {/* Password */}
-        <div>
-          <input
-              type="text"
-              value={password}
-              readOnly
-          />
-
-          <button onClick={copyPassword} disabled={!password}>
-            {copied ? "Copied!" : "Copy"}
-          </button>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        {/* Length */}
-        <div>
-          <label>
-            Length: {length}
-          </label>
-
-          <input
-              type="range"
-              min="4"
-              max="32"
-              value={length}
-              onChange={(e) =>
-                  setLength(Number(e.target.value))
-              }
-          />
-        </div>
-
-        {/* Numbers */}
-        <div>
-          <label>
-            <input
-                type="checkbox"
-                // checked={includeNumbers}
-                onChange={(e) =>
-                    setIncludeNumbers(e.target.checked)
-                }
-            />
-
-            Include Numbers
-          </label>
-        </div>
-
-        {/* Characters */}
-        <div>
-          <label>
-            <input
-                type="checkbox"
-                checked={includeCharacters}
-                onChange={(e) =>
-                    setIncludeCharacters(e.target.checked)
-                }
-            />
-
-            Include Characters
-          </label>
-        </div>
-
-        {/* Generate */}
-        <button onClick={generatePassword}>
-          Generate Password
-        </button>
-      </div>
-  );
+    );
 }
 
-export default PasswordGenerator;
+export default App;
